@@ -25,7 +25,7 @@ SECRET_KEY = '@2kvjd750m^een#^k+&j^r72z9d_d!g0yt%*r9e8%dpg&xoy9y'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['eatriteapp.herokuapp.com']
 
 
 # Application definition
