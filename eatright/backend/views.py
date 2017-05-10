@@ -8,13 +8,49 @@ from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from backend.models import Backend
 from backend.serializers import BackendSerializer
+import logging
 
-
+import googlemaps
+from datetime import datetime
+import json
+from geopy.distance import vincenty
 
 # Create your views here.
+gmaps = googlemaps.Client(key='AIzaSyBCvRzeb_-A2AKvKM0A5MqXkuKclf08gM4')
+logger = logging.getLogger(__name__)
 
-def index(request):
-        return HttpResponse("Hello, world. You're at the polls index.")
+
+@csrf_exempt
+def get_restaurant_list(request):
+    """ 
+    List all nearby restaurants.
+    """
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    location = (body['lat'], body['lon'])
+
+    query_result = gmaps.places_nearby( location = location, keyword='Restaurants', type='restaurant',rank_by='distance',open_now=True)
+
+    response = []
+    for result in query_result["results"]:
+        resp = {}
+        resp["id"] = result["id"]
+        resp["name"] = result["name"]
+        resp["place_id"] = result["place_id"]
+        resp["rating"] = result["rating"]
+        resp["address"] = result["vicinity"]
+        resp["lat"] = result["geometry"]["location"]["lat"]
+        resp["lng"] = result["geometry"]["location"]["lng"]
+        rest_loc = (resp["lat"], resp["lng"])
+        resp["distance"] = (vincenty(location, rest_loc).miles)
+        response.append(resp)
+
+    print response
+    new_list = sorted(response, key=lambda k: k['rating'], reverse=True)
+    return JsonResponse(new_list, status=200,safe=False)
+
+
+
 
 @csrf_exempt
 def backend_list(request):
@@ -33,6 +69,7 @@ def backend_list(request):
             serializer.save()
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
+
 
 @csrf_exempt
 def backend_detail(request, pk):
