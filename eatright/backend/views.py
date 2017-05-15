@@ -6,8 +6,7 @@ from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
-from backend.models import Backend
-from backend.serializers import BackendSerializer
+from backend.models import ItemInfo, Loc2RestMenu, RestaurantInfo
 import logging
 
 import googlemaps
@@ -27,7 +26,7 @@ def get_restaurant_list(request):
     """
     body_unicode = request.body.decode('utf-8')
     body = json.loads(body_unicode)
-    location = (body['lat'], body['lon'])
+    location = (body['lat'], body['lng'])
 
     query_result = gmaps.places_nearby( location = location, keyword='Restaurants', type='restaurant',rank_by='distance',open_now=True)
 
@@ -41,8 +40,8 @@ def get_restaurant_list(request):
         resp["address"] = result["vicinity"]
         resp["lat"] = result["geometry"]["location"]["lat"]
         resp["lng"] = result["geometry"]["location"]["lng"]
-        rest_loc = (resp["lat"], resp["lng"])
-        resp["distance"] = (vincenty(location, rest_loc).miles)
+        resp["loc"] = (resp["lat"], resp["lng"])
+        resp["distance"] = (vincenty(location, resp["loc"]).miles)
         response.append(resp)
 
     print response
@@ -50,50 +49,50 @@ def get_restaurant_list(request):
     return JsonResponse(new_list, status=200,safe=False)
 
 
-
-
 @csrf_exempt
-def backend_list(request):
+def get_menu_info(request):
+    """ 
+    Get Menu info.
     """
-    List all code backend, or create a new backend.
-    """
-    if request.method == 'GET':
-        backend = Backend.objects.all()
-        serializer = BackendSerializer(backend, many=True)
-        return JsonResponse(serializer.data, safe=False)
+    response = []
+    body_unicode = request.body.decode('utf-8')
+    body = json.loads(body_unicode)
+    #location = (body['lat'], body['lng'])
+    location = (body['loc'])
 
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = BackendSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+    lat = location[0]
+    lng = location[1]
+    #rest_i = (body['id'])
+    #address = (body['address'])
+    #ItemInfo, Loc2RestMenu, RestaurantInfo
+    row_id = Loc2RestMenu.objects.get(lat = lat, lng = lng)
 
+    print "Restaurant id: %s " % (row_id.restid)
+    print "Get all Menu based on restaurant id and generate a json object"
 
-@csrf_exempt
-def backend_detail(request, pk):
-    """
-    Retrieve, update or delete a code backend.
-    """
-    try:
-        backend = Backend.objects.get(pk=pk)
-    except Backend.DoesNotExist:
-        return HttpResponse(status=404)
+    # Get all menu info
+    resp = {}
+    resp["rest_id"] = row_id.restid
+    
+    #menu_items = ItemInfo.objects.filter(restid = row_id.restid)
+    #print "Menu items:", menu_items
+    for item in ItemInfo.objects.filter(restid = row_id.restid):
+        #print "Menu item: %s" % item.itemname
+        resp = {}
+        resp["item id"]= item.itemid
+        resp["item name"] = item.itemname
+        resp["price"] = item.price
+        resp["rating"] = item.rating
+        resp["desc"] = item.description
+        resp["type"] = item.type
+        response.append(resp)
 
-    if request.method == 'GET':
-        serializer = BackendSerializer(backend)
-        return JsonResponse(serializer.data)
+    #print "Found %s menu items for restaurant id %s" % (len(menu_items), row_id.restid)
 
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = BackendSerializer(backend, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+    # Get the restaurant id matching lat and lng 
 
-    elif request.method == 'DELETE':
-        backend.delete()
-        return HttpResponse(status=204)
+    #print response
+    new_list = sorted(response, key=lambda k: k['item id'], reverse=False)
+    return JsonResponse(new_list, status=200,safe=False)
+
 

@@ -77,10 +77,22 @@ WSGI_APPLICATION = 'eatright.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
-    }
+                'ENGINE': 'django.db.backends.mysql',
+                'NAME': 'heroku_cda3dcab8d93e1e',
+                'USER': 'b5ec501291d485',
+                'PASSWORD': 'f41fef76',
+                'HOST': 'us-cdbr-iron-east-03.cleardb.net',
+                'PORT': '3306',
+            }
 }
+#    'default': {
+#                'ENGINE': 'django.db.backends.mysql',
+#                'NAME': 'eatriteapp',
+#                'USER': 'root',
+#                'PASSWORD': '',
+#                'HOST': '127.0.0.1',
+#                'PORT': '3306',
+#            }
 
 
 # Password validation
