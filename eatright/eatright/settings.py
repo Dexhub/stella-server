@@ -76,24 +76,35 @@ WSGI_APPLICATION = 'eatright.wsgi.application'
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
 DATABASES = {
-    'default': {
+   'default': {
                 'ENGINE': 'django.db.backends.mysql',
-                'NAME': 'heroku_cda3dcab8d93e1e',
-                'USER': 'b5ec501291d485',
-                'PASSWORD': 'f41fef76',
-                'HOST': 'us-cdbr-iron-east-03.cleardb.net',
+                'NAME': 'eatriteapp',
+                'USER': 'root',
+                'PASSWORD': '',
+                'HOST': '104.154.179.152',
                 'PORT': '3306',
             }
 }
-#    'default': {
+
+#
+#        'OPTIONS': {
+#            'ssl':{
+#                    'key':'/Users/Dexter/Desktop/Code-repo/stella-server/eatright/eatright/client-key.pem',
+#                    'cert':'/Users/Dexter/Desktop/Code-repo/stella-server/eatright/eatright/client-cert.pem',
+#                    'ca':'/Users/Dexter/Desktop/Code-repo/stella-server/eatright/eatright/server-ca.pem'
+#            }
+#
+
+
+#   'default': {
 #                'ENGINE': 'django.db.backends.mysql',
 #                'NAME': 'eatriteapp',
 #                'USER': 'root',
-#                'PASSWORD': '',
-#                'HOST': '127.0.0.1',
+#                'PASSWORD': 'miakhalifa',
+#                'HOST': '104.154.179.152',
 #                'PORT': '3306',
 #            }
-
+#
 
 # Password validation
 # https://docs.djangoproject.com/en/1.11/ref/settings/#auth-password-validators
