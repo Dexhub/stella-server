@@ -116,6 +116,7 @@ def get_menu_info(request):
             name = body["name"]
             address = body["address"]
             placeId = body["placeId"]
+            rating = body["rating"]
             restaurant_object = RestaurantInfo(name=name, address=address, rating=rating, source="Google", placeid=placeId, sourceid=googleId)
             #restaurant_object.save()
             response["errMessage"] = "Missing menu for a new restaurant. Restaurant added in DB"
